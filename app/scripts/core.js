@@ -23,7 +23,70 @@ $(function () {
 			console.log('Error... ' + object);
 		}
 	});*/
-	getMessages();
+	// Backbone.js Example...
+	var userData = [
+		{
+			name: 'poplinr',
+			age: 23
+		},
+		{
+			name: 'vredesbyrdann',
+			age: 23
+		}
+	];
+	// Core Router...
+	// Query String Param Access...
+	var app;
+	var router = Backbone.Router.extend({
+		routes: {
+			'': 'home',
+			'users/:userName': 'loadUser'
+		},
+		initialize: function () {
+			// An instance of the Users Collection...
+			var users = new Users();
+			//...
+			users.reset(userData);
+			this.homeView = new homeView({collection: users});
+			this.userView = new userView({collection: users});
+		},
+		home: function () {
+			this.homeView.render();
+		},
+		loadUser: function (userName) {
+			this.userView.render(userName);
+		}
+	});
+	// homeView View...
+	var homeView = Backbone.View.extend({
+		el: 'body',
+		template: _.template('User Data: <%= data %>'),
+		render: function () {
+			this.$el.html(this.template({
+				data: JSON.stringify(this.collection.models)
+			}));
+		}
+		// subviews...
+	});
+	// Users Collection...
+	var Users = Backbone.Collection.extend({});
+	// userView View...
+	var userView = Backbone.View.extend({
+		template: _.template('<div>'  
+				+ '<h2><%= attributes.name %></h2>' 
+				+ '<span><%= attributes.age %></span>' 
+			+ '</div>'),
+		render: function (userName) {
+			var userModel = this.collection.where({name:userName})[0];
+			var userHtml = this.template(userModel);
+			$('body').html(userHtml);
+		}	
+	});	
+	app = new router;
+	Backbone.history.start();
+	// Chat Room Example Testing...
+	// Invoke getMessages();	
+	/*getMessages();
 	$('#send').click(function () {
 		var username, message;
 		// Replace .attr('value') with .val()...
@@ -52,9 +115,8 @@ $(function () {
 				console.log('An error has occured...');
 			}
 		});
-	});
-});
-function getMessages () { 
+	});*/
+/*function getMessages () { 
 	$.ajax({
 		url: 'https://api.parse.com/1/classes/MessageBoard',
 		headers: {
@@ -87,4 +149,5 @@ function updateView(messages) {
 		table.append(trEl);
 	});
 	console.log(messages);
-}
+}*/
+});
